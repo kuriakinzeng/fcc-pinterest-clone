@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  if homePage
+  if homePage && user
     h3 Post a Pin
     form.form-horizontal(action="/add",method='POST')
       input(type='hidden', name='_csrf', value=_csrf)
@@ -18,18 +18,19 @@ block content
           button.btn.btn-primary(type='submit')
             i.fa.fa-envelope
             | Post
-  #grid(data-columns)
-    each pin in pins
-      .panel.panel-default
-        .panel-body
-          img.img-responsive.img-center(src=pin.url, alt=pin.description)
-          p=pin.description
-          div
-            a(href=`/pins/${pin.owner._id}`)
-              img.profile-img(src=pin.owner.profile.picture)
-            if (!homePage && user && pin.owner._id == user.id)
-              form.form-inline-right(action="/delete",method="POST")
-                input(type='hidden', name='_csrf', value=_csrf)
-                input(type='hidden', name='id', value=pin._id)
-                button.btn.btn-xs.btn-danger(type='submit') 
-                  i.fa.fa-trash.fa-nm
+  .grid-container          
+    #grid(data-columns)
+      each pin in pins
+        .panel.panel-default
+          .panel-body
+            img.img-responsive.img-center(src=pin.url, alt=pin.description)
+            p=pin.description
+            div
+              a(href=`/pins/${pin.owner._id}`)
+                img.profile-img(src=pin.owner.profile.picture)
+              if (!homePage && user && pin.owner._id == user.id)
+                form.form-inline-right(action="/delete",method="POST")
+                  input(type='hidden', name='_csrf', value=_csrf)
+                  input(type='hidden', name='id', value=pin._id)
+                  button.btn.btn-xs.btn-danger(type='submit') 
+                    i.fa.fa-trash.fa-nm
