@@ -20,7 +20,10 @@ const expressStatusMonitor = require('express-status-monitor');
 const sass = require('node-sass-middleware');
 const multer = require('multer');
 
-const upload = multer({ dest: path.join(__dirname, 'uploads') });
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 52428800 } 
+});
 
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
@@ -112,12 +115,15 @@ app.use((req, res, next) => {
   }
   next();
 });
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: 0 }));
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: 86400000 }));
 
 /**
  * Primary app routes.
  */
 app.get('/', homeController.index);
+app.post('/add', homeController.postPin);
+app.post('/delete', homeController.deletePin);
+app.get('/pins/:userId', homeController.getPinsByUserId);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.logout);
@@ -162,7 +168,7 @@ app.get('/api/paypal', apiController.getPayPal);
 app.get('/api/paypal/success', apiController.getPayPalSuccess);
 app.get('/api/paypal/cancel', apiController.getPayPalCancel);
 app.get('/api/lob', apiController.getLob);
-app.get('/api/upload', apiController.getFileUpload);
+// app.get('/api/upload', apiController.getFileUpload);
 app.post('/api/upload', upload.single('myFile'), apiController.postFileUpload);
 app.get('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getPinterest);
 app.post('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postPinterest);

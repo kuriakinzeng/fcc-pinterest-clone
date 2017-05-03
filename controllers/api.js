@@ -47,15 +47,15 @@ exports.getFoursquare = (req, res, next) => {
     foursquare.Venues.getVenueAsync('49da74aef964a5208b5e1fe3', token.accessToken),
     foursquare.Users.getCheckinsAsync('self', null, token.accessToken)
   ])
-  .then(([trendingVenues, venueDetail, userCheckins]) => {
-    res.render('api/foursquare', {
-      title: 'Foursquare API',
-      trendingVenues,
-      venueDetail,
-      userCheckins
-    });
-  })
-  .catch(next);
+    .then(([trendingVenues, venueDetail, userCheckins]) => {
+      res.render('api/foursquare', {
+        title: 'Foursquare API',
+        trendingVenues,
+        venueDetail,
+        userCheckins
+      });
+    })
+    .catch(next);
 };
 
 /**
@@ -194,39 +194,39 @@ exports.getLastfm = (req, res, next) => {
       });
     });
   const artistTopAlbums = () =>
-      new Promise((resolve, reject) => {
-        lastfm.request('artist.getTopAlbums', {
-          artist: 'Roniit',
-          handlers: {
-            success: (data) => {
-              resolve(data.topalbums.album.slice(0, 3));
-            },
-            error: reject
-          }
-        });
+    new Promise((resolve, reject) => {
+      lastfm.request('artist.getTopAlbums', {
+        artist: 'Roniit',
+        handlers: {
+          success: (data) => {
+            resolve(data.topalbums.album.slice(0, 3));
+          },
+          error: reject
+        }
       });
+    });
   Promise.all([
     artistInfo(),
     artistTopTracks(),
     artistTopAlbums()
   ])
-  .then(([artistInfo, artistTopAlbums, artistTopTracks]) => {
-    const artist = {
-      name: artistInfo.artist.name,
-      image: artistInfo.artist.image.slice(-1)[0]['#text'],
-      tags: artistInfo.artist.tags.tag,
-      bio: artistInfo.artist.bio.summary,
-      stats: artistInfo.artist.stats,
-      similar: artistInfo.artist.similar.artist,
-      topAlbums: artistTopAlbums,
-      topTracks: artistTopTracks
-    };
-    res.render('api/lastfm', {
-      title: 'Last.fm API',
-      artist
-    });
-  })
-  .catch(next);
+    .then(([artistInfo, artistTopAlbums, artistTopTracks]) => {
+      const artist = {
+        name: artistInfo.artist.name,
+        image: artistInfo.artist.image.slice(-1)[0]['#text'],
+        tags: artistInfo.artist.tags.tag,
+        bio: artistInfo.artist.bio.summary,
+        stats: artistInfo.artist.stats,
+        similar: artistInfo.artist.similar.artist,
+        topAlbums: artistTopAlbums,
+        topTracks: artistTopTracks
+      };
+      res.render('api/lastfm', {
+        title: 'Last.fm API',
+        artist
+      });
+    })
+    .catch(next);
 };
 
 /**
@@ -321,15 +321,15 @@ exports.getSteam = (req, res, next) => {
     playerSummaries(),
     ownedGames()
   ])
-  .then(([playerAchievements, playerSummaries, ownedGames]) => {
-    res.render('api/steam', {
-      title: 'Steam Web API',
-      ownedGames: ownedGames.response.games,
-      playerAchievemments: playerAchievements.playerstats,
-      playerSummary: playerSummaries.response.players[0]
-    });
-  })
-  .catch(next);
+    .then(([playerAchievements, playerSummaries, ownedGames]) => {
+      res.render('api/steam', {
+        title: 'Steam Web API',
+        ownedGames: ownedGames.response.games,
+        playerAchievemments: playerAchievements.playerstats,
+        playerSummary: playerSummaries.response.players[0]
+      });
+    })
+    .catch(next);
 };
 
 /**
@@ -459,16 +459,16 @@ exports.getInstagram = (req, res, next) => {
     ig.media_popularAsync(),
     ig.user_self_media_recentAsync()
   ])
-  .then(([searchByUsername, searchByUserId, popularImages, myRecentMedia]) => {
-    res.render('api/instagram', {
-      title: 'Instagram API',
-      usernames: searchByUsername,
-      userById: searchByUserId,
-      popularImages,
-      myRecentMedia
-    });
-  })
-  .catch(next);
+    .then(([searchByUsername, searchByUserId, popularImages, myRecentMedia]) => {
+      res.render('api/instagram', {
+        title: 'Instagram API',
+        usernames: searchByUsername,
+        userById: searchByUserId,
+        popularImages,
+        myRecentMedia
+      });
+    })
+    .catch(next);
 };
 
 /**
@@ -566,9 +566,31 @@ exports.getFileUpload = (req, res) => {
   });
 };
 
+const AWS = require('aws-sdk');
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  subregion: 'us-west-2',
+});
+const s3 = new AWS.S3();
+
 exports.postFileUpload = (req, res) => {
-  req.flash('success', { msg: 'File was uploaded successfully.' });
-  res.redirect('/api/upload');
+  console.log('postFileUpload',req.file);
+  console.log(req.body);
+  const fileName = req.body.description; // must change this to slug
+  s3.putObject({
+    Bucket: 'kurize-pinster',
+    Key: fileName,
+    Body: req.file.buffer,
+    ACL: 'public-read', // your permisions
+  }, (err) => {
+    if (err) return err;
+    return true;
+    // res.send('File uploaded to S3');
+    // res.redirect('/api/upload');
+  });
+  // req.flash('success', { msg: 'File was uploaded successfully.' });
+  // res.redirect('/api/upload');
 };
 
 /**

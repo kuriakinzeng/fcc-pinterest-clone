@@ -1,27 +1,35 @@
 extends layout
 
 block content
-  h1 Hackathon Starter
-  p.lead A boilerplate for Node.js web applications.
-  hr
-  .row
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
-    .col-sm-6
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
+  if homePage
+    h3 Post a Pin
+    form.form-horizontal(action="/add",method='POST')
+      input(type='hidden', name='_csrf', value=_csrf)
+      .form-group
+        label(class='col-sm-2 control-label', for='url') URL
+        .col-sm-8
+          input.form-control(type='text', name='url', id='url', autofocus=true)
+      .form-group
+        label(class='col-sm-2 control-label', for='description') Description
+        .col-sm-8
+          input.form-control(type='text', name='description', id='description')
+      .form-group
+        .col-sm-offset-2.col-sm-8
+          button.btn.btn-primary(type='submit')
+            i.fa.fa-envelope
+            | Post
+  #grid(data-columns)
+    each pin in pins
+      .panel.panel-default
+        .panel-body
+          img.img-responsive.img-center(src=pin.url, alt=pin.description)
+          p=pin.description
+          div
+            a(href=`/pins/${pin.owner._id}`)
+              img.profile-img(src=pin.owner.profile.picture)
+            if (!homePage && user && pin.owner._id == user.id)
+              form.form-inline-right(action="/delete",method="POST")
+                input(type='hidden', name='_csrf', value=_csrf)
+                input(type='hidden', name='id', value=pin._id)
+                button.btn.btn-xs.btn-danger(type='submit') 
+                  i.fa.fa-trash.fa-nm
