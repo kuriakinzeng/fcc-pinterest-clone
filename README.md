@@ -1,6 +1,6 @@
-# Free Code Camp's Manage a Book Trading Club Basecamp Challenge
+# Free Code Camp's Pinterest Clone Basecamp Challenge
 
-**tl;dr:** This app allows users trade books
+**tl;dr:** This app allows users to share images to others
 
 ## User Stories:
 1. As an unauthenticated user, I can login with Twitter.
@@ -11,14 +11,13 @@
 6. As an authenticated user, if I upload an image that is broken, it will be replaced by a placeholder image. (can use jQuery broken image detection)
 
 ## Architecture
-The app is built on Express framework. It uses [hackathon-starter](https://github.com/sahat/hackathon-starter) as a boilerplate, S3 to host images, and Masonry library to display pins in grids.
+The app is built on Express framework. It uses [hackathon-starter](https://github.com/sahat/hackathon-starter) as a boilerplate, and Salvattore library to display pins in grids.
 
 ## Run locally
 ```npm install && npm run dev```
 
 ## Deployment
 TODO:
-1. Change S3 ```<AllowedOrigin>``` config
 
 ## Contributing
 
